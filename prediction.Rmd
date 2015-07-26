@@ -1,0 +1,131 @@
+---
+title: "Practical machine learning: Prediting the exercise type"
+author: "Jigme Norbu"
+date: "July 26, 2015"
+output: html_document
+---
+
+## Overview
+
+The goal of this project is to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants and predict the manner in which they did the exercise.They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. 
+
+
+## Loading the data 
+
+First we will load both the training (df_train) and testing (df_test) data sets. However, we are not going to touch the testing data set until we have built our predictoin model and we want to test it.
+
+```{r, message=F, warning=F, echo=F}
+setwd("C:/Users/Jigme505/Desktop/DATA SCIENCE COURSEs/8 - Practical Machine Learning/Course Project/")
+
+df_train <- read.csv("data/training/pml-training.csv", na.strings=c("", "NA"))
+df_test <- read.csv("data/test/pml-testing.csv", na.strings = c("", "NA"))
+```
+
+Instead, we will be using the caret package to partition the training data set into testing and training subsets. I decided to partition it by p=0.8 (i.e. keep 80% of the observations as part of the training subset and the rest as the testing) using the createDataPartition() function.
+
+```{r, warning=F, message=F}
+require(caret)
+set.seed(200)
+inTrain <- createDataPartition(df_train$classe, p=0.8, list=F)
+
+training <- df_train[inTrain,]
+testing <- df_train[-inTrain,]
+```
+
+There seems to be lot of predictors with lot of empty values (NA). These predictors would not be very useful in predicting the outcome and so I get rid of all the predictors that are of no use. I use the function apply() to get rid of the useless predictors from both the training and testing subset.
+
+```{r, warning=F, message=F}
+
+training <- training[ , apply(training, 2, function(x) !any(is.na(x)))]
+testing <- testing[ , apply(testing, 2, function(x) !any(is.na(x)))]
+
+training <- training[,-1]
+testing <- testing[,-1]
+```
+
+
+## Cross-Validation
+
+I use trainControl() funtion to use the cross validation method. The idea is that, we have already split the main training data into training subset and testing subset and we will be building a model on the training set. So we want to use cross validation method on the training subset to further spit the training subset, build the model, test it and repeat that process as specified. 
+
+## Model
+
+Since the outcome variable is a group (factors), it doesn't make much sense to use regression models. So I decided to use the prediction with trees (rpart) model which is a method of classification. 
+
+Here I am using the centering and scaling pre-process function as part of the model since using pca doesn't make sense in a classification model. 
+ 
+```{r, warning=F, message=F, cache=T}
+
+control =trainControl(method="cv", number=30, p=0.7)
+
+mfit <- train(classe~., method="rpart", trControl=control, preProc=c("center","scale"), data = training)
+mfit
+```
+
+So the cross-validation process allows us to pick the optimal model based on highest accuracy. The final coplexity parameter used for the model was 0.032. The following graph shows the change in accuracy (cross-validation) with respect to change in complexity parameter. As 
+
+```{r, warning=F, message=F, fig.align="center"}
+plot(mfit, uniform=T)
+```
+
+Here's the classification dendogram plot for the final model.
+
+```{r, warning=F, message=F, echo=F, fig.align="center", fig.height=8, fig.width=10}
+library(rattle)
+fancyRpartPlot(mfit$finalModel)
+```
+
+the probability values in the nodes determine the threshold probability of being in certain class. 
+
+## In Sample Prediction
+
+Now, we can try to use the final model to test the model on the testing subset. We use the predict() function and the confusion matrix to summarize the results. These results show the in sample errors and so we would expect the out of sample error to be larger than these values. 
+
+```{r, warning=F, message=F}
+pred <- predict(mfit, newdata = testing)
+Conf_matrix <- confusionMatrix(testing$classe, pred)
+```
+
+Here is our prediction results on the testing subset.
+```{r, warning=F, message=F, echo=F}
+Conf_matrix$table
+```
+
+Here is the overall statistics
+```{r, warning=F, message=F, echo=F}
+Conf_matrix$overall
+```
+
+And finally the statistics by class
+```{r, warning=F, message=F, echo=F}
+t(Conf_matrix$byClass)
+```
+
+
+## Out of Sample Prediction 
+
+We are finally ready to use our model to predict the outcome using the actual test dataset (df_test). First we must process it exactly the way we did in the training set. As pointed out earlier, we would expect the out of sample errors to be greater than the in sample errors. 
+
+* getting rid of all the NA columns. 
+```{r, warning=F, message=F, echo=F}
+df_test <- df_test[ , apply(df_test, 2, function(x) !any(is.na(x)))]
+df_test <- df_test[,-1]
+
+pred_test <- predict(mfit, newdata = df_test)
+answers <- as.character(pred_test)
+answers
+```
+
+These are my predictions. Since my accuracy is 0.62 I would expect my out of sample accuracy to be less than 60%. 
+```{r, message=F, warning=F, echo=F, eval=F}
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(answers)
+```
+
