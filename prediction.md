@@ -79,24 +79,24 @@ mfit
 ## The final value used for the model was cp = 0.03186471.
 ```
 
-So the cross-validation process allows us to pick the optimal model based on highest accuracy. The final coplexity parameter used for the model was 0.032. The following graph shows the change in accuracy (cross-validation) with respect to change in complexity parameter. As 
+So the cross-validation process allows us to pick the optimal model based on highest accuracy. The final complexity parameter used for the model was 0.032. The following graph shows the change in accuracy (cross-validation) with respect to change in complexity parameter. As 
 
 
 ```r
 plot(mfit, uniform=T)
 ```
 
-<img src="assets/fig/unnamed-chunk-5-1.png" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;" />
+<img src="figure/unnamed-chunk-5-1.png" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;" />
 
 Here's the classification dendogram plot for the final model.
 
-<img src="assets/fig/unnamed-chunk-6-1.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;" />
+<img src="figure/unnamed-chunk-6-1.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;" />
 
 the probability values in the nodes determine the threshold probability of being in certain class. 
 
-## In Sample Prediction
+## Out of Sample Prediction
 
-Now, we can try to use the final model to test the model on the testing subset. We use the predict() function and the confusion matrix to summarize the results. These results show the in sample errors and so we would expect the out of sample error to be larger than these values. 
+Now, we can try to use the final model to test the model on the testing subset. We use the predict() function and the confusion matrix to summarize the results. These results show the out of sample error rates.
 
 
 ```r
@@ -140,9 +140,9 @@ And finally the statistics by class
 ```
 
 
-## Out of Sample Prediction 
+## Actual Testing Sample Prediction 
 
-We are finally ready to use our model to predict the outcome using the actual test dataset (df_test). First we must process it exactly the way we did in the training set. As pointed out earlier, we would expect the out of sample errors to be greater than the in sample errors. 
+We are finally ready to use our model to predict the outcome using the actual test dataset (df_test). First we must process it exactly the way we did in the training set. 
 
  
 
@@ -151,7 +151,11 @@ We are finally ready to use our model to predict the outcome using the actual te
 ## [18] "D" "A" "B"
 ```
 
-These are my predictions. Since my accuracy is 0.62 I would expect my out of sample accuracy to be less than 60%. 
+These are my predictions. Since my accuracy is 0.62 for out of sample accuracy I would expect this accuracy to be less than 60%. 
+
+## Conclusion/Alternative
+
+Given the time constraint I was unable to make use of random forest method (which should have given better accuracy results) but it is defitely an alternative that is best used when you have access to faster processing computer and more time. Nontheless, we were able to learn more about cross-validation through this "rpart" method.
 
 
 ========================================================================
