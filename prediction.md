@@ -86,11 +86,11 @@ So the cross-validation process allows us to pick the optimal model based on hig
 plot(mfit, uniform=T)
 ```
 
-<img src="figure/unnamed-chunk-5-1.png" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-5-1.png" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;" />
 
 Here's the classification dendogram plot for the final model.
 
-<img src="figure/unnamed-chunk-6-1.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-6-1.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;" />
 
 the probability values in the nodes determine the threshold probability of being in certain class. 
 
@@ -144,7 +144,7 @@ And finally the statistics by class
 
 We are finally ready to use our model to predict the outcome using the actual test dataset (df_test). First we must process it exactly the way we did in the training set. As pointed out earlier, we would expect the out of sample errors to be greater than the in sample errors. 
 
-* getting rid of all the NA columns. 
+ 
 
 ```
 ##  [1] "C" "B" "B" "A" "A" "C" "D" "D" "A" "A" "C" "B" "B" "A" "B" "B" "C"
@@ -152,5 +152,8 @@ We are finally ready to use our model to predict the outcome using the actual te
 ```
 
 These are my predictions. Since my accuracy is 0.62 I would expect my out of sample accuracy to be less than 60%. 
+
+
+========================================================================
 
 
